@@ -25,18 +25,45 @@ def get_cpu_usage():
         except:
             return 0
 
-def handle_client(client_socket, address):
+def get_ram_usage():
+    """Get current RAM usage in gigabytes with 1 decimal point"""
+    try:
+        # Try using psutil if available
+        import psutil
+        used_bytes = psutil.virtual_memory().used
+        used_gb = used_bytes / (1024.0 ** 3)
+        return round(used_gb, 1)
+    except ImportError:
+        # Fallback to simple method
+        try:
+            result = subprocess.run(['free', '-b'], capture_output=True, text=True)
+            lines = result.stdout.split('\n')
+            for line in lines:
+                if line.startswith('Mem:'):
+                    # Parse memory usage in bytes
+                    parts = line.split()
+                    used_bytes = float(parts[2])
+                    used_gb = used_bytes / (1024.0 ** 3)
+                    return round(used_gb, 1)
+        except:
+            return 0.0
+
+def handle_client(client_socket, address, mode='cpu'):
     """Handle a connected client"""
     print("Client connected from:", address)
     
     try:
         while True:
-            # Get CPU usage
-            cpu_usage = get_cpu_usage()
+            # Get usage based on mode
+            if mode == 'ram':
+                usage = get_ram_usage()
+                print("Sent RAM usage: {} GB".format(usage))
+            else:
+                usage = get_cpu_usage()
+                print("Sent CPU usage: {}%".format(usage))
             
             # Send to client
-            client_socket.send("{}\r\n".format(cpu_usage).encode())
-            print("Sent CPU usage: {}%".format(cpu_usage))
+            client_socket.send("{}\r\n".format(usage).encode())
             
             # Wait before next update
             time.sleep(0.25)
@@ -51,6 +78,19 @@ def main():
     # Server configuration
     HOST = '192.168.1.201'  # Listen on all interfaces
     PORT = 8080
+    
+    # Parse command-line arguments
+    mode = 'cpu'  # Default mode
+    if len(sys.argv) > 1:
+        if sys.argv[1].lower() == 'ram':
+            mode = 'ram'
+            print("Mode: RAM usage")
+        else:
+            print("Mode: CPU usage (default)")
+            print("Usage: python pc_server.py [cpu|ram]")
+    else:
+        print("Mode: CPU usage (default)")
+        print("Usage: python pc_server.py [cpu|ram]")
     
     # Create socket
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -70,7 +110,7 @@ def main():
             # Handle client in a separate thread
             client_thread = threading.Thread(
                 target=handle_client,
-                args=(client_socket, address)
+                args=(client_socket, address, mode)
             )
             client_thread.daemon = True
             client_thread.start()

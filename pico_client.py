@@ -14,7 +14,7 @@ import _thread
 from wifi_settings import WIFI_SSID, WIFI_PASSWORD
 
 #AUTO-V
-version = "v0.1-2025/12/06r09"
+version = "v0.1-2025/12/06r16"
 
 
 # PC server
@@ -158,6 +158,36 @@ def debug_output(output):
     """Output debug information to console"""
     print("DEBUG:", output)
 
+def format_value_with_decimal(value):
+    """Format a float value into 4 digit display with decimal point
+    Formats as: XXX.X or XX.XX depending on value
+    Returns tuple: (digit0, digit1, digit2, digit3, dot_position)
+    dot_position: 0-3 for which digit gets the dot, or -1 for no dot
+    """
+    try:
+        val = float(value)
+        # Format with 1 decimal place, up to 3 digits before decimal
+        if val >= 100:
+            # Format as XXX (no decimal)
+            formatted = int(val) % 1000
+            digit0 = formatted // 100
+            digit1 = (formatted % 100) // 10
+            digit2 = formatted % 10
+            digit3 = 0
+            dot_pos = -1
+        else:
+            # Format as XX.X
+            formatted = int(val * 10) % 1000
+            digit0 = 0
+            digit1 = formatted // 100
+            digit2 = (formatted % 100) // 10
+            digit3 = formatted % 10
+            dot_pos = 2  # Dot on the tens position
+        
+        return (digit0, digit1, digit2, digit3, dot_pos)
+    except:
+        return (0, 0, 0, 0, -1)
+
 # Shared variable for CPU usage
 cpu_usage = None
 
@@ -168,7 +198,30 @@ def display_updater():
 
     while True:
         if cpu_usage is not None:
-            display.write_all(str(cpu_usage))
+            try:
+                digit0, digit1, digit2, digit3, dot_pos = format_value_with_decimal(cpu_usage)
+                
+                # Write each digit with optional dot
+                seg0 = display.SEG8[digit0]
+                seg1 = display.SEG8[digit1]
+                seg2 = display.SEG8[digit2]
+                seg3 = display.SEG8[digit3]
+                
+                # Apply dot to appropriate digit
+                if dot_pos == 1:
+                    seg1 |= Dot
+                elif dot_pos == 2:
+                    seg2 |= Dot
+                elif dot_pos == 3:
+                    seg3 |= Dot
+                
+                # Write to display
+                display.write_cmd(KILOBIT, seg0)
+                display.write_cmd(HUNDREDS, seg1)
+                display.write_cmd(TENS, seg2)
+                display.write_cmd(UNITS, seg3)
+            except Exception as e:
+                debug_output("Error updating display: {}".format(e))
         #time.sleep(0.1)  # Update every 100ms
 
 def main():
@@ -216,9 +269,9 @@ def main():
                     data = sock.recv(1024).decode('utf-8').strip()
                     if data:
                         try:
-                            # Convert to integer and update shared variable
-                            cpu_usage = int(data)
-                            debug_output("Received CPU usage: {}%".format(cpu_usage))
+                            # Convert to float and update shared variable
+                            cpu_usage = float(data)
+                            debug_output("Received CPU usage: {}".format(cpu_usage))
                         except ValueError:
                             print("Invalid data received:", data)
 
