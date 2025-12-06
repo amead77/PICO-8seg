@@ -49,7 +49,7 @@ def handle_client(client_socket, address):
 
 def main():
     # Server configuration
-    HOST = '0.0.0.0'  # Listen on all interfaces
+    HOST = '192.168.1.201'  # Listen on all interfaces
     PORT = 8080
     
     # Create socket
