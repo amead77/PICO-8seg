@@ -8,6 +8,9 @@ import subprocess
 import threading
 import sys
 
+#AUTO-V
+version = "v0.1-2025/12/06r01"
+
 def get_cpu_usage():
     """Get current CPU usage percentage"""
     try:
