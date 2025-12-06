@@ -14,7 +14,7 @@ import _thread
 from wifi_settings import WIFI_SSID, WIFI_PASSWORD
 
 #AUTO-V
-version = "v0.1-2025/12/06r02"
+version = "v0.1-2025/12/06r05"
 
 
 # PC server
@@ -109,7 +109,7 @@ def connect_wifi():
     wlan.active(True)
 
     if not wlan.isconnected():
-        print('Connecting to WiFi...')
+        print('Connecting to WiFi: '+WIFI_SSID)
         wlan.connect(WIFI_SSID, WIFI_PASSWORD)
 
         # Wait for connection
@@ -117,12 +117,12 @@ def connect_wifi():
         while max_wait > 0:
             if wlan.status() < 0 or wlan.status() >= 3:
                 break
-            print('Waiting for connection...'+str(max_wait))
+            print('Waiting for connection: '+str(max_wait))
             time.sleep(2)
             max_wait -= 1
 
         if wlan.status() != 3:
-            print('Failed to connect to WiFi'+str(wlan.status()))
+            print('Failed to connect to WiFi: '+str(wlan.status()))
             return None
 
     print('Connected to WiFi')
