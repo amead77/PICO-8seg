@@ -14,7 +14,7 @@ import _thread
 from wifi_settings import WIFI_SSID, WIFI_PASSWORD
 
 #AUTO-V
-version = "v0.1-2025/12/06r08"
+version = "v0.1-2025/12/06r09"
 
 
 # PC server
@@ -31,6 +31,7 @@ KILOBIT   = 0xFE
 HUNDREDS  = 0xFD
 TENS      = 0xFB
 UNITS     = 0xF7
+Dot       = 0x80
 
 # Segment codes for digits 0-9
 SEG8Code = [
@@ -222,7 +223,7 @@ def main():
                             print("Invalid data received:", data)
 
                 # Small delay to prevent excessive CPU usage
-                time.sleep(0.1)
+                time.sleep(0.2)
 
             except socket.timeout:
                 print("Socket timeout, attempting to reconnect...")
