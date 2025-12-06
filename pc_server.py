@@ -1,4 +1,7 @@
 # pc_server.py
+# this is the server part that runs on a linux pc and serves cpu or ram stats to the the pico w client.
+# by default it outputs cpu %, add 'ram' to the command line to output ram usage.
+#
 import socket
 import time
 import subprocess

@@ -1,8 +1,9 @@
 # pico_client.py
-# part code came from the single example from waveshare, rest is custom
+# code written for Raspberry Pi Pico W with 8-segment waveshare display
+# part code came from the single example from waveshare (literally the minimum working example), rest is custom.
 # updating the display is done in a thread as the waveshare device requires continuous refreshing
 # the pico w code connects to pc_server.py, running on a linux pc on the same network, although that could be elsewhere.
-# still some flicker from the display.
+# still some flicker from the display. put the wifi ssid and password in wifi_settings.py and upload to your pico w.
 
 import network
 import socket
@@ -14,7 +15,7 @@ import _thread
 from wifi_settings import WIFI_SSID, WIFI_PASSWORD
 
 #AUTO-V
-version = "v0.1-2025/12/06r16"
+version = "v0.1-2025/12/06r18"
 
 
 # PC server
