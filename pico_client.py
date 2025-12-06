@@ -14,7 +14,7 @@ import _thread
 from wifi_settings import WIFI_SSID, WIFI_PASSWORD
 
 #AUTO-V
-version = "v0.1-2025/12/06r05"
+version = "v0.1-2025/12/06r08"
 
 
 # PC server
@@ -149,7 +149,7 @@ def test_loop(display):
     """Test loop that counts from 0000 to 0099"""
     print("Starting test loop...")
     for i in range(9999):
-        display.write_all(pad_with_zeros(str(i), 4))
+        display.write_all(i)
         #time.sleep(0.2)  # Display each number for 200ms
     print("Test loop completed.")
 
