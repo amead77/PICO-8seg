@@ -1,3 +1,4 @@
 wifi_settings.py
 Pico-8SEG-LED.py
 main.py
+pico_sdk_import.cmake
